@@ -1,0 +1,25 @@
+{
+  "name": "ticket-api",
+  "version": "0.0.1",
+  "description": "API to get ticket VR balance",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm test",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vitorleal/ticket-api.git"
+  },
+  "keywords": [
+    "ticket"
+  ],
+  "author": "Vitor Leal <vitorleal1@gmail.com>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/vitorleal/ticket-api/issues"
+  },
+  "dependencies": {
+    "express": "~3.4.0"
+  }
+}
