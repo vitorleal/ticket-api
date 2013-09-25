@@ -44,5 +44,9 @@ app.get('/card/:number', function(req, res) {
     });
 });
 
+app.get('*', function(req, res) {
+  res.send({ "error": "404", "sugestion": "You should use /card/0000000000000000"});
+});
+
 app.listen(3000);
 console.log('Listening on port 3000...');
