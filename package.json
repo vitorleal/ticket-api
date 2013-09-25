@@ -2,6 +2,7 @@
   "name": "ticket-api",
   "version": "0.0.1",
   "description": "API to get ticket VR balance",
+  "private": true,
   "main": "server.js",
   "scripts": {
     "test": "npm test",
@@ -20,6 +21,7 @@
     "url": "https://github.com/vitorleal/ticket-api/issues"
   },
   "dependencies": {
-    "express": "~3.4.0"
+    "express": "~3.4.0",
+    "request": "~2.27.0"
   }
 }
