@@ -1,6 +1,7 @@
-var express  = require('express'),
-     request = require('request'),
-     app     = express();
+var express   = require('express'),
+     request  = require('request'),
+     newrelic = require('newrelic'),
+     app      = express();
 
 
 //Make url function
@@ -45,7 +46,7 @@ app.get('/card/:number', function(req, res) {
 });
 
 app.get('*', function(req, res) {
-  res.send({ "error": "404", "sugestion": "You should use /card/0000000000000000"});
+  res.send({ "error": "404", "suggestion": "You should use /card/0000000000000000"});
 });
 
 app.listen(process.env.PORT || 3000);
