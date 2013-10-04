@@ -31,7 +31,13 @@ app.get('/card/:number', function(req, res) {
 
     request(options, function(err, response, body) {
       if (!err && response.statusCode === 200) {
-        var result = JSON.parse(body);
+        var result;
+        try {
+          result = JSON.parse(body);
+
+        } catch(e) {
+          result = body;
+        }
 
         if (err || !result.status) {
           res.send({ "error": result.messageError });
