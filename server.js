@@ -90,7 +90,7 @@ app.get('/list/:number', function(req, res) {
           request(options, function (error, resp, content) {
             var json = JSON.parse(content);
             console.log(content);
-            res.send({ "balance": result.balance, "list": json.card.release });
+            res.send({ "balance": json.card.balance, "list": json.card.release });
           });
 
         } catch(e) {
