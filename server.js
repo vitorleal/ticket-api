@@ -79,6 +79,7 @@ app.get('/list/:number', function(req, res) {
     request(options, function(err, response, body) {
       if (!err && response.statusCode === 200) {
         var result;
+
         try {
           result = JSON.parse(body);
 
@@ -88,9 +89,31 @@ app.get('/list/:number', function(req, res) {
           };
 
           request(options, function (error, resp, content) {
-            var json = JSON.parse(content);
-            console.log(content);
-            res.send({ "balance": json.card.balance, "list": json.card.release });
+            var json;
+
+            if (!error && resp.statusCode === 200) {
+              try {
+                json = JSON.parse(content);
+
+              } catch(e) {
+                json = content;
+              }
+
+              if (err || !json.status) {
+                res.send({ "error": json.messageError });
+
+              } else {
+                res.send({
+                  "balance"   : json.card.balance,
+                  "list"      : json.card.release,
+                  "scheduling": json.card.scheduling
+                });
+              }
+
+
+            } else {
+              res.send({ "error": error });
+            }
           });
 
         } catch(e) {
