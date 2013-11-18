@@ -3,6 +3,15 @@ var express   = require('express'),
      newrelic = require('newrelic'),
      app      = express();
 
+var def = {
+  headers: {
+    "Host"            : "www.ticket.com.br",
+    "Referer"         : "http://www.ticket.com.br/portal/portalcorporativo/home/home.htm",
+    "X-Requested-With": "XMLHttpRequest",
+    "Accept"          : "application/json, text/javascript, */*; q=0.01"
+  }
+}
+
 var allowCrossDomain = function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
@@ -14,27 +23,27 @@ app.configure(function () {
 });
 
 //Make url function
-var makeUrl = function(card) {
+var makeUrl = function(card, token, rows) {
   var base   = "http://www.ticket.com.br/portal-web/consult-card",
       random = function() {
         return Math.random();
-      };
+      },
+      rows = (rows) ? rows : 10;
 
-  return base + "/balance/json?chkProduto=TR&card=" + card + "&rand=" + random;
+  if (!token) {
+    return base + "/balance/json?chkProduto=TR&card=" + card + "&rand=" + random;
+
+  } else {
+    return "" + base + "/release/json?txtOperacao=lancamentos&token=" + token + "&card=" + card + "&rows=" + rows + "&rand=" + random;
+  }
 };
-
 
 //Get card balance
 app.get('/card/:number', function(req, res) {
     var card = req.params.number;
 
     var options = {
-      headers: {
-        "Host"   : "www.ticket.com.br",
-        "Referer": "http://www.ticket.com.br/portal/portalcorporativo/home/home.htm",
-        "X-Requested-With": "XMLHttpRequest",
-        "Accept" : "application/json, text/javascript, */*; q=0.01"
-      },
+      headers: def.headers,
       url: makeUrl(card)
     };
 
@@ -53,6 +62,38 @@ app.get('/card/:number', function(req, res) {
 
         } else {
           res.send(result.card);
+        }
+      } else {
+        res.send({ "error": err });
+      }
+    });
+});
+
+app.get('/list/:number', function(req, res) {
+    var card = req.params.number,
+        options = {
+          headers: def.headers,
+          url    : makeUrl(card)
+        };
+
+    request(options, function(err, response, body) {
+      if (!err && response.statusCode === 200) {
+        var result;
+        try {
+          result = JSON.parse(body);
+
+          var options = {
+            headers: def.headers,
+            url    : makeUrl(card, result.token)
+          };
+
+          request(options, function (error, resp, content) {
+            var json = JSON.parse(content);
+            res.send({ "card": card, "list": json.card.release });
+          });
+
+        } catch(e) {
+          result = body;
         }
       } else {
         res.send({ "error": err });
