@@ -34,7 +34,7 @@ var makeUrl = function(card, token, rows) {
     return base + "/balance/json?chkProduto=TR&card=" + card + "&rand=" + random;
 
   } else {
-    return "" + base + "/release/json?txtOperacao=lancamentos&token=" + token + "&card=" + card + "&rows=" + rows + "&rand=" + random;
+    return base + "/release/json?txtOperacao=lancamentos&token=" + token + "&card=" + card + "&rows=" + rows + "&rand=" + random;
   }
 };
 
@@ -89,7 +89,8 @@ app.get('/list/:number', function(req, res) {
 
           request(options, function (error, resp, content) {
             var json = JSON.parse(content);
-            res.send({ "card": card, "list": json.card.release });
+            console.log(content);
+            res.send({ "card": card, "balance": result.balance, "list": json.card.release });
           });
 
         } catch(e) {
