@@ -115,6 +115,8 @@ app.get('/list/:number', function(req, res) {
             } else {
               res.send({ "error": error });
             }
+
+            result = null;
           });
 
         } catch(e) {
