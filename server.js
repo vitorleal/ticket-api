@@ -29,24 +29,23 @@ var makeUrl = function(card, token, rows) {
       random = function() {
         return Math.random();
       },
-      rows = (rows) ? rows : 20;
+      rows = (rows) ? rows : 15;
 
   if (!token) {
-    return base + "/balance/json?chkProduto=TR&card=" + card + "&rand=" + random;
+    return base + "/balance/json?chkProduto=TR&card=" + card + "&rand=" + random();
 
   } else {
-    return base + "/release/json?txtOperacao=lancamentos&token=" + token + "&card=" + card + "&rows=" + rows + "&rand=" + random;
+    return base + "/release/json?txtOperacao=lancamentos&token=" + token + "&card=" + card + "&rows=" + rows + "&rand=" + random();
   }
 };
 
 //Get card balance
 app.get('/card/:number', function(req, res) {
-    var card = req.params.number;
-
-    var options = {
-      headers: def.headers,
-      url: makeUrl(card)
-    };
+    var card = req.params.number,
+        options = {
+          headers: def.headers,
+          url: makeUrl(card)
+        };
 
     request(options, function(err, response, body) {
       if (!err && response.statusCode === 200) {
@@ -84,12 +83,12 @@ app.get('/list/:number', function(req, res) {
         try {
           result = JSON.parse(body);
 
-          var options = {
+          var opt = {
             headers: def.headers,
             url    : makeUrl(card, result.token)
           };
 
-          request(options, function (error, resp, content) {
+          request(opt, function (error, resp, content) {
             var json;
 
             if (!error && resp.statusCode === 200) {
