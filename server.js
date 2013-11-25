@@ -15,7 +15,6 @@ var def = {
 var allowCrossDomain = function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  res.header("Cache-Control:", "max-age=0");
   next();
 };
 
@@ -29,7 +28,7 @@ var makeUrl = function(card, token, rows) {
       random = function() {
         return Math.random();
       },
-      rows = (rows) ? rows : 15;
+      rows = (rows) ? rows : 12;
 
   if (!token) {
     return base + "/balance/json?chkProduto=TR&card=" + card + "&rand=" + random();
