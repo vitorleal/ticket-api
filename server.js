@@ -29,7 +29,7 @@ var makeUrl = function(card, token, rows) {
       random = function() {
         return Math.random();
       },
-      rows = (rows) ? rows : 12;
+      rows = (rows) ? rows : 20;
 
   if (!token) {
     return base + "/balance/json?chkProduto=TR&card=" + card + "&rand=" + random();
