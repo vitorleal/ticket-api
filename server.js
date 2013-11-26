@@ -20,6 +20,7 @@ var allowCrossDomain = function(req, res, next) {
 
 app.configure(function () {
   app.use(allowCrossDomain);
+  app.use(express.compress());
 });
 
 //Make url function
