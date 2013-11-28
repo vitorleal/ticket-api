@@ -61,6 +61,9 @@ app.get('/card/:number', function(req, res) {
           res.send({ "error": result.messageError });
 
         } else {
+          var json = result.card;
+          result.card.token = result.token;
+
           res.send(result.card);
         }
       } else {
