@@ -1,6 +1,6 @@
 var express   = require('express'),
      request  = require('request'),
-     newrelic = require('newrelic'),
+     //newrelic = require('newrelic'),
      app      = express();
 
 var def = {
@@ -39,95 +39,132 @@ var makeUrl = function(card, token, rows) {
   }
 };
 
+
 //Get card balance
 app.get('/card/:number', function(req, res) {
-    var card = req.params.number,
-        options = {
-          headers: def.headers,
-          url: makeUrl(card)
-        };
+  var card = req.params.number,
+      options = {
+        headers: def.headers,
+        url: makeUrl(card)
+      };
 
-    request(options, function(err, response, body) {
-      if (!err && response.statusCode === 200) {
-        var result;
-        try {
-          result = JSON.parse(body);
+  request(options, function(err, response, body) {
+    if (!err && response.statusCode === 200) {
+      var result;
+      try {
+        result = JSON.parse(body);
 
-        } catch(e) {
-          result = body;
-        }
-
-        if (err || !result.status) {
-          res.send({ "error": result.messageError });
-
-        } else {
-          var json = result.card;
-          result.card.token = result.token;
-
-          res.send(result.card);
-        }
-      } else {
-        res.send({ "error": err });
+      } catch(e) {
+        result = body;
       }
-    });
+
+      if (err || !result.status) {
+        res.send({ "error": result.messageError });
+
+      } else {
+        var json          = result.card;
+        result.card.token = result.token;
+
+        res.send(result.card);
+      }
+    } else {
+      res.send({ "error": err });
+    }
+  });
 });
 
+
+//Get card balance with list of last transactions
 app.get('/list/:number', function(req, res) {
-    var card = req.params.number,
-        options = {
+  var card    = req.params.number,
+      options = {
+        headers: def.headers,
+        url    : makeUrl(card)
+      };
+
+  request(options, function(err, response, body) {
+    if (!err && response.statusCode === 200) {
+      var result;
+
+      try {
+        result = JSON.parse(body);
+
+        var opt = {
           headers: def.headers,
-          url    : makeUrl(card)
+          url    : makeUrl(card, result.token)
         };
 
-    request(options, function(err, response, body) {
-      if (!err && response.statusCode === 200) {
-        var result;
+        request(opt, function (error, resp, content) {
+          var json;
 
-        try {
-          result = JSON.parse(body);
+          if (!error && resp.statusCode === 200) {
+            try {
+              json = JSON.parse(content);
 
-          var opt = {
-            headers: def.headers,
-            url    : makeUrl(card, result.token)
-          };
-
-          request(opt, function (error, resp, content) {
-            var json;
-
-            if (!error && resp.statusCode === 200) {
-              try {
-                json = JSON.parse(content);
-
-              } catch(e) {
-                json = content;
-              }
-
-              if (err || !json.status) {
-                res.send({ "error": json.messageError });
-
-              } else {
-                res.send({
-                  "balance"   : json.card.balance,
-                  "list"      : json.card.release,
-                  "scheduling": json.card.scheduling
-                });
-              }
-
-
-            } else {
-              res.send({ "error": error });
+            } catch(e) {
+              json = content;
             }
 
-          });
+            if (err || !json.status) {
+              res.send({ "error": json.messageError });
 
-        } catch(e) {
-          result = body;
-        }
-      } else {
-        res.send({ "error": err });
+            } else {
+              res.send({
+                "balance"   : json.card.balance,
+                "list"      : json.card.release,
+                "scheduling": json.card.scheduling
+              });
+            }
+
+          } else {
+            res.send({ "error": error });
+          }
+        });
+
+      } catch(e) {
+        result = body;
       }
-    });
+    } else {
+      res.send({ "error": err });
+    }
+  });
 });
+
+
+//Get list of last transactions only
+app.get('/listonly/:number/:token', function (req, res) {
+  var card    = req.params.number,
+      token   = req.params.token,
+      options = {
+        headers: def.headers,
+        url    : makeUrl(card, token)
+      };
+
+  request(options, function (error, resp, content) {
+    var json;
+
+    if (!error && resp.statusCode === 200) {
+      try {
+        json = JSON.parse(content);
+
+      } catch(e) {
+        json = content;
+      }
+
+      if (error || !json.status) {
+        res.send({ "error": json.messageError });
+
+      } else {
+        res.send({
+          "list": json.card.release
+        });
+      }
+    } else {
+      res.send({ "error": error });
+    }
+  });
+});
+
 
 app.get('*', function(req, res) {
   res.send({ "error": "404", "suggestion": "You should use /card/0000000000000000"});
